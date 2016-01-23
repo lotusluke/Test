@@ -1,0 +1,43 @@
+Imports System.IO
+
+Public Class Form1
+    Public BackupDir As DirectoryInfo
+
+    Public Sub New()
+
+        ' This call is required by the designer.
+        InitializeComponent()
+
+        ' Add any initialization after the InitializeComponent() call.
+        Dim TempDir As String = My.Application.Info.DirectoryPath
+        If Not TempDir.EndsWith("\") Then TempDir += "\"
+        BackupDir = New DirectoryInfo(TempDir)
+
+    End Sub
+
+    Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
+        Dim FoundBackups As FileInfo()
+
+
+        FoundBackups = BackupDir.GetFiles("*.txt") 'Find all txt files in the Backups folder and return the file names in an array
+        If FoundBackups.Count > 0 Then Call RenameFiles(FoundBackups)
+
+    End Sub
+
+    Public Sub RenameFiles(ByVal FoundFiles As FileInfo())
+        Dim FileReader As StreamReader
+        Dim buFileName As String
+        Dim buFileCode As String
+        Dim CurFile As FileInfo
+
+        For BackupNum As Integer = 0 To FoundFiles.Count - 1
+            buFileName = FoundFiles(BackupNum).Name
+            CurFile = New FileInfo(BackupDir.FullName & buFileName) 'Create a FileObject to read
+            buFileName = Microsoft.VisualBasic.Left(buFileName, buFileName.Length - 4)
+            FileReader = CurFile.OpenText() 'Open file to enable reading it
+            buFileCode = FileReader.ReadToEnd() 'Get and store the file
+            FileReader.Close() 'Close the open file
+        Next
+    End Sub
+
+End Class
